@@ -1,13 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import {db,storage} from '../firebase'
 import firebase from 'firebase'
+import DayPickerInput from "react-day-picker/DayPickerInput";
+import "react-day-picker/lib/style.css";
+
  
  const UploadForm = () => {
 
     const [info, setInfo] = useState({itemName:"",itemImage:{},startingPrice:""})
     const [progress, setProgress] = useState(0);
 const [prevItems, setPrevItems] = useState();
-const [newObj, setnewObj] = useState({})
+const [date1, setDate1] = useState(new Date());
+const [date2, setDate2] = useState(new Date());
+
+  function onChange1(date) {
+    setDate1(date);
+  }
+  function onChange2(date) {
+    setDate2(date);
+  }
+
+
 
    
    function makeid(length) {
@@ -54,32 +67,26 @@ const [newObj, setnewObj] = useState({})
             .child(`${imageName}.jpg`)
             .getDownloadURL()
             .then((imageUrl) => {
-                 setnewObj({
+                const newObj={
                     itemName:info.itemName,
                     itemUrl:imageUrl,
-                    startingPrice:info.startingPrice
+                    startingPrice:info.startingPrice,
+                    fromDate:date1,
+                    toDate:date2
 
-                })
+                }
                 console.log(newObj)
-              db.collection("allBidItems").doc("new").get().then((doc) => {
-              
-                    // doc.data() is never undefined for query doc snapshots
-                    console.log(doc.id, " => ", doc.data());
-                  setPrevItems(doc.data().items)
-                   console.log("prev",prevItems)
-             
-                  
-    
-                })
+              db.collection("allBidItems").add(newObj)
+   
               
              
                
        
-            }).then(()=>{
-                db.collection("allBidItems").doc("new")
-                    .update({
-                        items: firebase.firestore.FieldValue.arrayUnion(newObj)
-                    });
+            // }).then(()=>{
+            //     db.collection("allBidItems").doc("new")
+            //         .update({
+            //             items: firebase.firestore.FieldValue.arrayUnion(newObj)
+            //         });
                     
                  
             });
@@ -95,6 +102,8 @@ const [newObj, setnewObj] = useState({})
          
           <input name="startingPrice" onChange={onChangeHandler} />
           <input  type="file" name="itemImage" onChange={selectfile} />
+          <DayPickerInput onDayChange={onChange1} />;
+          <DayPickerInput onDayChange={onChange2} />;
          
           <button onClick={uploadFile}>
             Submit
