@@ -61,13 +61,20 @@ const [date2, setDate2] = useState(new Date());
           console.log(error);
         },
         async() => {
-         
+          let newObj;
+          let length;
             storage
             .ref("images")
             .child(`${imageName}.jpg`)
             .getDownloadURL()
-            .then((imageUrl) => {
-                const newObj={
+            .then(async(imageUrl) => {
+              await db.collection("allBidItems").get().then(function(querySnapshot) {      
+                length=querySnapshot.size+1; 
+                console.log( length)
+             
+             });
+             newObj={
+id:length,
                     itemName:info.itemName,
                     itemUrl:imageUrl,
                     startingPrice:info.startingPrice,
@@ -76,20 +83,16 @@ const [date2, setDate2] = useState(new Date());
 
                 }
                 console.log(newObj)
-              db.collection("allBidItems").add(newObj)
+        
    
               
              
                
        
-            // }).then(()=>{
-            //     db.collection("allBidItems").doc("new")
-            //         .update({
-            //             items: firebase.firestore.FieldValue.arrayUnion(newObj)
-            //         });
-                    
-                 
-            });
+            }).then(()=>{
+             
+              db.collection("allBidItems").add(newObj)
+            });;
     })}
     
 
