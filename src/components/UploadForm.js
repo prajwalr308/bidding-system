@@ -100,6 +100,7 @@ const UploadForm = () => {
               startingPrice: info.startingPrice,
               fromDate: date1,
               toDate: date2,
+              placeBids:[]
             };
             console.log(newObj);
           })
